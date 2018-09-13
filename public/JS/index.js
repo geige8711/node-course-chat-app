@@ -12,23 +12,40 @@ socket.on('connect', () => {
     //     console.log('Got it', data);
     // });
     socket.on('newMessage', (message)=>{
-        console.log('New Message',message);
-        let formattedTime = moment(message.createAt).format('h:mm a');
-        let li = jQuery('<li></li>');
-        li.text(`${message.from} ${formattedTime}: ${message.text}`);
+        let formattedTime = moment(message.createdAt).format('h:mm a');
+        let template = jQuery('#message-template').html();
+        let html = Mustache.render(template,{
+            text: message.text,
+            from: message.from,
+            createdAt: formattedTime
+        });
 
-        jQuery('#messages').append(li);
+        jQuery('#messages').append(html);
+    //     console.log('New Message',message);
+    //     let formattedTime = moment(message.createAt).format('h:mm a');
+    //     let li = jQuery('<li></li>');
+    //     li.text(`${message.from} ${formattedTime}: ${message.text}`);
+    //
+    //     jQuery('#messages').append(li);
     });
 
     socket.on('newLocationMessage', function (message) {
-        let formattedTime = moment(message.createAt).format('h:mm a');
-        let li = jQuery('<li></li>');
-        let a = jQuery('<a target="_blank">My current location</a>');
+        let formattedTime = moment(message.createdAt).format('h:mm a');
+        let template = jQuery('#location-message-template').html();
+        let html = Mustache.render(template, {
+            from: message.from,
+            url: message.url,
+            createdAt: formattedTime
+        });
 
-        li.text(`${message.from} ${formattedTime}: `);
-        a.attr('href', message.url);
-        li.append(a);
-        jQuery('#messages').append(li);
+        jQuery('#messages').append(html);
+        // let li = jQuery('<li></li>');
+        // let a = jQuery('<a target="_blank">My current location</a>');
+        //
+        // li.text(`${message.from} ${formattedTime}: `);
+        // a.attr('href', message.url);
+        // li.append(a);
+        // jQuery('#messages').append(li);
     });
 
 });
