@@ -2,14 +2,14 @@ let socket = io();
 
 function scrollToBottom () {
     //selectors
-    var messages = jQuery('#messages');
-    var newMessage = messages.children('li:last-child');
+    let messages = jQuery('#messages');
+    let newMessage = messages.children('li:last-child');
     //Heights
-    var clientHeight = messages.prop('clientHeight');
-    var scrollTop = messages.prop('scrollTop');
-    var scrollHeight = messages.prop('scrollHeight');
-    var newMessageHeight = newMessage.innerHeight();
-    var lastMessageHeight = newMessage.prev().innerHeight();
+    let clientHeight = messages.prop('clientHeight');
+    let scrollTop = messages.prop('scrollTop');
+    let scrollHeight = messages.prop('scrollHeight');
+    let newMessageHeight = newMessage.innerHeight();
+    let lastMessageHeight = newMessage.prev().innerHeight();
 
     if(clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
         messages.scrollTop(scrollHeight);
@@ -18,6 +18,15 @@ function scrollToBottom () {
 
 socket.on('connect', () => {
     console.log('Connected to server');
+    let params = jQuery.deparam(window.location.search);
+    socket.emit('join', params, function (err) {
+        if (err) {
+            alert(err);
+            window.location.href = '/';
+        } else {
+            console.log('No error');
+        }
+    });
     // socket.emit('createMessage',{
     //     from: 'Andrew',
     //     text: 'Yup, that works for me.'

@@ -3,7 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 const {generateMessage, generateLocationMessage} = require('./utils/message');
-
+const {isRealString} = require('./utils/validation');
 
 let app = express();
 let server = http.createServer(app);
@@ -32,6 +32,16 @@ io.on('connection', (socket) => {
     // socket.on('createEmail', (newEmail) => {
     //     console.log('createEmail', newEmail);
     // });
+    socket.on('join', (params, callback) => {
+        if(!isRealString(params.name) || !isRealString(params.room)) {
+            callback('Name and room name are required.');
+        }
+        socket.join(params.room);
+        socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+        socket.broadcast.to(params.room).emit('newMessage', generateMessage('Admin', `${params.name} has joined`));
+        callback();
+    });
+
     socket.on('createMessage', (message, callback) => {
         console.log('createMessage', message);
         io.emit('newMessage', generateMessage(message.from, message.text));
@@ -47,9 +57,9 @@ io.on('connection', (socket) => {
         io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
 
-    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
-
-    socket.broadcast.emit('newMessage', generateMessage('Admin', 'new User join in'))
+    // socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
+    //
+    // socket.broadcast.emit('newMessage', generateMessage('Admin', 'new User join in'))
     // socket.emit('newMessage', {
     //     from: 'John',
     //     text: 'See you then',
